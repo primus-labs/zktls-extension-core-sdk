@@ -25,8 +25,7 @@ exports.getAttestationResult = async (timeout = 2 * 60 * 1000) => {
       try {
         let res = await sendMessageAsync({
           type: 'algorithm',
-          method: 'getAttestation',
-          params: paramsObj
+          method: 'getAttestationResult',
         });
         resObj = res.result;
       } catch (err) {
