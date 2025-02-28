@@ -62,24 +62,30 @@ chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
   let result;
   if (message.type === 'algorithm' && message.method === 'init') {
     result = await init();
+    console.log('offscreen onMessage send result', result);
+    sendResponse({ result });
   } else if (
     message.type === 'algorithm' &&
     message.method === 'getAttestation'
   ) {
     result = await getAttestation(message.params);
+    console.log('offscreen onMessage send result', result);
+    sendResponse({ result });
   } else if (
     message.type === 'algorithm' &&
     message.method === 'getAttestationResult'
   ) {
     result = await getAttestationResult();
+    console.log('offscreen onMessage send result', result);
+    sendResponse({ result });
   } else if (
     message.type === 'algorithm' &&
     message.method === 'startOffline'
   ) {
     result = await startOffline(message.params);
+    console.log('offscreen onMessage send result', result);
+    sendResponse({ result });
   }
-  console.log('offscreen onMessage send result', result);
-  sendResponse({ result });
 });
 
 

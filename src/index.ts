@@ -13,12 +13,15 @@ import { AttestationErrorCode } from 'config/error';
 class PrimusExtCoreTLS {
   appId: string;
   appSecret?: string;
-  algoUrls: AlgorithmUrls
+  algoUrls?: AlgorithmUrls
 
   constructor() {
     this.appId = '';
     this.appSecret = '';
-    this.algoUrls = new AlgorithmUrls()
+    const isNodeEnv = typeof process !== 'undefined' && process.versions && process.versions.node;
+    if (!isNodeEnv) {
+      this.algoUrls = new AlgorithmUrls();
+    }
   }
 
   async init(appId: string, appSecret?: string): Promise<string | boolean> {

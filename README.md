@@ -263,7 +263,7 @@ async function primusProofTest() {
     const generateRequestStr = generateRequest.toJsonString();
 
     // Get signed resopnse from backend.
-    const response = await fetch(`http://YOUR_URL:PORT?YOUR_CUSTOM_PARAMETER=${generateRequestStr}`);
+    const response = await fetch(`http://YOUR_URL:PORT?YOUR_CUSTOM_PARAMETER=${encodeURIComponent(generateRequestStr)}`);
     const responseJson = await response.json();
     const signedRequestStr = responseJson.signResult;
 
@@ -309,8 +309,9 @@ app.get("/primus/sign", async (req, res) => {
   await zkTLS.init(appId, appSecret);
 
   // Sign the attestation request.
-  console.log("signParams=", req.query.signParams);
-  const signResult = await zkTLS.sign(req.query.signParams);
+  const signParams = decodeURIComponent(req.query.signParams);
+  console.log("signParams=", signParams);
+  const signResult = await zkTLS.sign(signParams);
   console.log("signResult=", signResult);
 
   // Return signed result.
