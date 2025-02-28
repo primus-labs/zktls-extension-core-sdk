@@ -61,7 +61,7 @@ Because our algorithm wasm library and wasm js encapsulation use SharedArrayBuff
 
 ### webpack.config.js
 
-When the extension is compiled, copy the 4 files directly to the extension build directory. `webpack.config.js` needs to add the following configuration.
+When the extension is compiled, copy the 4 files directly to the extension build directory. `webpack.config.js` needs to add the following configuration. You can refer to [demo webpack.config.js](https://github.com/primus-labs/zktls-demo/blob/main/extension-core-sdk-example/webpack.config.js).
 
 ```javascript
 new CopyWebpackPlugin({
@@ -132,10 +132,12 @@ The extension manifest.json file may add the following configuration:
 
 The appSecret from Primus Developer Hub needs to sign the proof request parameters. For security reasons, appSecret cannot be configured on the extension side. The Test Example configures appSecret in the extension code to better illustrate the process.
 
+This Test Example guide will walk you through the fundamental steps to integrate Primus's zkTLS Extension Core SDK and complete a basic data verification process through your Extension. You can learn about the integration process through this simple [demo](https://github.com/primus-labs/zktls-demo/blob/main/extension-core-sdk-example/src/pages/Background/index.js).
+
 ### Implementation
 
 ```javascript
-const { PrimusExtCoreTLS } = require("@fksyuan/zktls-ext-core-sdk");
+const { PrimusExtCoreTLS } = require("@primuslabs/zktls-ext-core-sdk");
 
 async function primusProofTest() {
     // Initialize parameters, the init function is recommended to be called when the program is initialized.
@@ -190,3 +192,132 @@ async function primusProofTest() {
 ```
 
 ## Production Example
+
+The Production Example and Test Example processes are the same. The difference is that the appSecret is stored on your server, and when signing the attestation request parameters, the parameters are passed to your server, which signs them and then passes them to the extension.
+
+### zkTLS Models
+
+We offer two modes in various user scenarios:
+
+1. proxytls
+2. mpctls
+
+```javascript
+// Set zkTLS mode, default is proxy model.
+generateRequest.setAttMode({
+  algorithmType: "proxytls",
+});
+```
+
+### Extra Data
+
+Developers can include custom additional parameters as auxiliary data when submitting an attestation request. These parameters will be returned alongside the proof results. For example, developers can pass the user's ID or other business-related parameters.
+
+```javascript
+// Set additionParams.
+const additionParams = JSON.stringify({
+  YOUR_CUSTOM_KEY: "YOUR_CUSTOM_VALUE",
+  YOUR_CUSTOM_KEY2: "YOUR_CUSTOM_VALUE2",
+});
+generateRequest.setAdditionParams(additionParams);
+```
+
+### Extension Implementation
+
+Extension does not require appSecret parameter to initialize SDK.
+
+```javascript
+const { PrimusExtCoreTLS } = require("@primuslabs/zktls-ext-core-sdk");
+
+async function primusProofTest() {
+    // Initialize parameters, the init function is recommended to be called when the program is initialized.
+    const appId = "PRIMUS_APP_ID";
+    const zkTLS = new PrimusExtCoreTLS();
+    const initResult = await zkTLS.init(appId);
+    console.log("primusProof initResult=", initResult);
+
+    // Set request and responseResolves.
+    const request ={
+        url: "YOUR_CUSTOM_URL", // Request endpoint.
+        method: "REQUEST_METHOD", // Request method.
+        header: {}, // Request headers.
+        body: "" // Request body.
+    };
+    // The responseResolves is the response structure of the url.
+    // For example the response of the url is: {"data":[{ ..."instFamily": "","instType":"SPOT",...}]}.
+    const responseResolves = [
+        {
+            keyName: 'CUSTOM_KEY_NAME', // According to the response keyname, such as: instType.
+            parsePath: 'CUSTOM_PARSE_PATH', // According to the response parsePath, such as: $.data[0].instType.
+        }
+    ];
+    // Generate attestation request.
+    const generateRequest = zkTLS.generateRequestParams(request, responseResolves);
+
+    // Set zkTLS mode, default is proxy model. (This is optional)
+    generateRequest.setAttMode({
+        algorithmType: "proxytls"
+    });
+
+    // Transfer request object to string.
+    const generateRequestStr = generateRequest.toJsonString();
+
+    // Get signed resopnse from backend.
+    const response = await fetch(`http://YOUR_URL:PORT?YOUR_CUSTOM_PARAMETER=${generateRequestStr}`);
+    const responseJson = await response.json();
+    const signedRequestStr = responseJson.signResult;
+
+    // Start attestation process.
+    const attestation = await zkTLS.startAttestation(signedRequestStr);
+    console.log("attestation=", attestation);
+
+    const verifyResult = zkTLS.verifyAttestation(attestation);
+    console.log("verifyResult=", verifyResult);
+    if (verifyResult === true) {
+        // Business logic checks, such as attestation content and timestamp checks
+        // do your own business logic.
+    } else {
+        // If failed, define your own logic.
+    }
+}
+```
+
+### Server Implementation
+
+The server is mainly responsible for obtaining the attestation parameters generated by the extension, and then using appSecret to sign the proof parameters.
+
+```javascript
+const express = require("express");
+const cors = require("cors");
+const { PrimusExtCoreTLS } = require("@primuslabs/zktls-ext-core-sdk");
+
+const app = express();
+const port = YOUR_PORT;
+
+// Just for test, developers can modify it.
+app.use(cors());
+
+// Listen to the client's signature request and sign the attestation request.
+app.get("/primus/sign", async (req, res) => {
+  const appId = "YOUR_APPID";
+  const appSecret = "YOUR_SECRET";
+
+  // Create a PrimusZKTLS object.
+  const zkTLS = new PrimusExtCoreTLS();
+
+  // Set appId and appSecret through the initialization function.
+  await zkTLS.init(appId, appSecret);
+
+  // Sign the attestation request.
+  console.log("signParams=", req.query.signParams);
+  const signResult = await zkTLS.sign(req.query.signParams);
+  console.log("signResult=", signResult);
+
+  // Return signed result.
+  res.json({ signResult });
+});
+
+app.listen(port, () => {
+  console.log(`Server is running at http://localhost:${port}`);
+});
+```
