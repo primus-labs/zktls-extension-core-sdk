@@ -109,8 +109,8 @@ You need to import two js files in your offscreen html.
 ```html
 <html>
   ......
+  <script src="primus_zk.js"></script>
   <script src="client_plugin.js"></script>
-	<script src="primus_zk.js"></script>
   ......
 </html>
 ```
@@ -135,7 +135,58 @@ The appSecret from Primus Developer Hub needs to sign the proof request paramete
 ### Implementation
 
 ```javascript
+const { PrimusExtCoreTLS } = require("@fksyuan/zktls-ext-core-sdk");
 
+async function primusProofTest() {
+    // Initialize parameters, the init function is recommended to be called when the program is initialized.
+    const appId = "PRIMUS_APP_ID";
+    const appSecret= "PRIMUS_APP_SECRET";
+    const zkTLS = new PrimusExtCoreTLS();
+    const initResult = await zkTLS.init(appId, appSecret);
+    console.log("primusProof initResult=", initResult);
+
+    // Set request and responseResolves.
+    const request ={
+        url: "YOUR_CUSTOM_URL", // Request endpoint.
+        method: "REQUEST_METHOD", // Request method.
+        header: {}, // Request headers.
+        body: "" // Request body.
+    };
+    // The responseResolves is the response structure of the url.
+    // For example the response of the url is: {"data":[{ ..."instFamily": "","instType":"SPOT",...}]}.
+    const responseResolves = [
+        {
+            keyName: 'CUSTOM_KEY_NAME', // According to the response keyname, such as: instType.
+            parsePath: 'CUSTOM_PARSE_PATH', // According to the response parsePath, such as: $.data[0].instType.
+        }
+    ];
+    // Generate attestation request.
+    const generateRequest = zkTLS.generateRequestParams(request, responseResolves);
+
+    // Set zkTLS mode, default is proxy model. (This is optional)
+    generateRequest.setAttMode({
+        algorithmType: "proxytls"
+    });
+
+    // Transfer request object to string.
+    const generateRequestStr = generateRequest.toJsonString();
+
+    // Sign request.
+    const signedRequestStr = await zkTLS.sign(generateRequestStr);
+
+    // Start attestation process.
+    const attestation = await zkTLS.startAttestation(signedRequestStr);
+    console.log("attestation=", attestation);
+
+    const verifyResult = zkTLS.verifyAttestation(attestation);
+    console.log("verifyResult=", verifyResult);
+    if (verifyResult === true) {
+        // Business logic checks, such as attestation content and timestamp checks
+        // do your own business logic.
+    } else {
+        // If failed, define your own logic.
+    }
+}
 ```
 
 ## Production Example
