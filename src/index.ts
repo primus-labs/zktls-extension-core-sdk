@@ -10,7 +10,7 @@ import { assemblyParams } from './assembly_params';
 import { ZkAttestationError } from './classes/Error'
 import { AttestationErrorCode } from 'config/error';
 
-class PrimusCoreTLS {
+class PrimusExtCoreTLS {
   appId: string;
   appSecret?: string;
   algoUrls: AlgorithmUrls
@@ -21,10 +21,15 @@ class PrimusCoreTLS {
     this.algoUrls = new AlgorithmUrls()
   }
 
-  async init(appId: string, appSecret: string): Promise<string | boolean> {
+  async init(appId: string, appSecret?: string): Promise<string | boolean> {
     this.appId = appId;
     this.appSecret = appSecret;
-    return await init();
+    const isNodeEnv = typeof process !== 'undefined' && process.versions && process.versions.node;
+    if (appSecret && isNodeEnv) {
+      return Promise.resolve(true)
+    } else {
+      return await init();
+    }
   }
 
   generateRequestParams(request: AttNetworkRequest, 
@@ -39,7 +44,7 @@ class PrimusCoreTLS {
     })
   }
 
-  async sign(signParams: string): Promise<SignedAttRequest> {
+  async sign(signParams: string): Promise<string> {
     if (this.appSecret) {
       const wallet = new ethers.Wallet(this.appSecret);
       const messageHash = ethers.utils.keccak256(new TextEncoder().encode(signParams));
@@ -48,16 +53,15 @@ class PrimusCoreTLS {
         attRequest: JSON.parse(signParams),
         appSignature: sig
       };
-      return result;
+      return JSON.stringify(result);
     } else {
       throw new Error("Must pass appSecret");
     }
   }
 
-  async startAttestation(attRequest: AttRequest): Promise<any> {
+  async startAttestation(attestationParamsStr: string): Promise<any> {
     try {
-      const signParams = attRequest.toJsonString()
-      const signedAttRequest = await this.sign(signParams);
+      const signedAttRequest = JSON.parse(attestationParamsStr) as SignedAttRequest;
       const attParams = assemblyParams(signedAttRequest, this.algoUrls);
       const getAttestationRes = await getAttestation(attParams);
       if (getAttestationRes.retcode !== "0") {
@@ -107,4 +111,4 @@ class PrimusCoreTLS {
 
 }
 
-export { PrimusCoreTLS, Attestation };
+export { PrimusExtCoreTLS, Attestation };
