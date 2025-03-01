@@ -1,5 +1,5 @@
 # zktls-extension-core-sdk
-Primus zktls algorithm sdk for extension.
+Primus zktls algorithm sdk for extension. When developers develop extension and do not want to rely on Primus Extension, they can use this SDK to directly call the Primus zktls algorithm interface and run zktls proof with Primus Attestor.
 
 ## Overview
 
