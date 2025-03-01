@@ -1,8 +1,10 @@
 import { v4 as uuidv4 } from 'uuid';
 import { AttNetworkRequest, AttNetworkResponseResolve, SignedAttRequest } from './index.d'
 import { AlgorithmUrls } from './classes/AlgorithmUrls';
-export function assemblyParams(att: SignedAttRequest, algorithmUrls: AlgorithmUrls) {
-    const { primusMpcUrl, primusProxyUrl, proxyUrl } = algorithmUrls
+export function assemblyParams(att: SignedAttRequest, algorithmUrls?: AlgorithmUrls) {
+    const primusMpcUrl = algorithmUrls? algorithmUrls.primusMpcUrl : "";
+    const primusProxyUrl = algorithmUrls? algorithmUrls.primusProxyUrl : "";
+    const proxyUrl = algorithmUrls? algorithmUrls.proxyUrl : "";;
     let padoUrl = primusProxyUrl;
     let modelType = "proxytls";
     const { attRequest: { request, responseResolves, attMode, userAddress, appId, additionParams}, appSignature } = att

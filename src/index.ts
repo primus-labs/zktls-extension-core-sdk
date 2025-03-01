@@ -19,7 +19,9 @@ class PrimusExtCoreTLS {
     this.appId = '';
     this.appSecret = '';
     const isNodeEnv = typeof process !== 'undefined' && process.versions && process.versions.node;
-    if (!isNodeEnv) {
+    if (isNodeEnv) {
+      this.algoUrls = undefined;
+    } else {
       this.algoUrls = new AlgorithmUrls();
     }
   }
