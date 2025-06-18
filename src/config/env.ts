@@ -1,15 +1,15 @@
 const pEnv = 'production'
 const pEnvMap = {
   production: {
-    PRIMUS_PROXY_URL: 'wss://api1.padolabs.org/algorithm-proxyV2',
-    PRIMUS_MPC_URL: 'wss://api1.padolabs.org/algorithmV2',
-    PROXY_URL: 'wss://api1.padolabs.org/algoproxyV2',
+    PRIMUS_PROXY_URL: 'wss://api1.padolabs.org/algorithm-proxyV3',
+    PRIMUS_MPC_URL: 'wss://api1.padolabs.org/algorithmV3',
+    PROXY_URL: 'wss://api1.padolabs.org/algoproxyV3',
     BASE_SERVICE_URL: 'https://api.padolabs.org',
   },
   test: {
-    PRIMUS_PROXY_URL: 'wss://api-dev.padolabs.org/algorithm-proxyV2',
-    PRIMUS_MPC_URL: 'wss://api-dev.padolabs.org/algorithmV2',
-    PROXY_URL: 'wss://api-dev.padolabs.org/algoproxyV2',
+    PRIMUS_PROXY_URL: 'wss://api-dev.padolabs.org/algorithm-proxyV3',
+    PRIMUS_MPC_URL: 'wss://api-dev.padolabs.org/algorithmV3',
+    PROXY_URL: 'wss://api-dev.padolabs.org/algoproxyV3',
     BASE_SERVICE_URL: 'https://api-dev.padolabs.org',
   }
 }
