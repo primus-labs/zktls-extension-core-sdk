@@ -7,9 +7,9 @@ The Extension Core SDK allows you to verify data through **web endpoint response
 
 To integrate, **create a project** in the [Primus Develop Hub](https://dev.primuslabs.xyz/) to obtain a paired appID and appSecret. Then, configure these credentials in your project to utilize the Extension Core SDK.
 
-Primus Extension Core SDK supports two models: the [Proxy TLS model](https://docs.primuslabs.xyz/data-verification/tech-intro#proxy-model) and the [MPC TLS model](https://docs.primuslabs.xyz/data-verification/tech-intro#mpc-model). You can specify the desired model by setting the "algorithmType" parameter during SDK integration.
+Primus Extension Core SDK supports two models: the [Proxy TLS model](https://docs.primuslabs.xyz/primus-network/tech-intro#proxy-mode) and the [MPC TLS model](https://docs.primuslabs.xyz/primus-network/tech-intro#mpc-mode). You can specify the desired model by setting the "algorithmType" parameter during SDK integration.
 
-For more details on setting up your project, refer to the [Developer Hub](https://docs.primuslabs.xyz/data-verification/developer-hub).
+For more details on setting up your project, refer to the [Developer Hub](https://docs.primuslabs.xyz/build/developer-hub).
 
 ## How it Works
 
@@ -17,7 +17,7 @@ Here's a simplified flow of how the Primus Extension Core SDK works on your proj
 
 **1. Create Project:** Create a project on the [Primus Developer Hub](https://dev.primuslabs.xyz/) to obtain a paired appID and appSecret, then configure them in your project.
 
-**2. Configure Verification Parameters:** Ensure that two key parameters, including the request parameters and response data paths, are configured correctly. Refer to the [simple example](https://docs.primuslabs.xyz/data-verification/core-sdk/simpleexample) for guidance.
+**2. Configure Verification Parameters:** Ensure that two key parameters, including the request parameters and response data paths, are configured correctly.
 
 **3. Execute zkTLS Protocol:** Invoke the zkTLS protocol to initiate the data verification process.
 
