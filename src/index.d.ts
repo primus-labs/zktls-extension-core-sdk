@@ -8,7 +8,9 @@ export type AttNetworkRequest = {
 export type AttNetworkResponseResolve = {
     keyName: string,
     parsePath: string,
-    parseType?: string
+    parseType?: string,
+    op?: string,
+    value?: string | number
 }
 
 export type Attestor = {
@@ -30,6 +32,7 @@ export type Attestation = {
 
 export type AttModeAlgorithmType = 'mpctls' | 'proxytls'
 export type AttModeResultType = 'plain' | 'cipher'
+export type AttSslCipher = 'ECDHE-RSA-AES128-GCM-SHA256' | 'ECDHE-ECDSA-AES128-GCM-SHA256'
 export type AttMode = {
   algorithmType: AttModeAlgorithmType;
   resultType: AttModeResultType;
@@ -37,8 +40,8 @@ export type AttMode = {
 
 export type BaseAttestationParams = {
     appId: string;
-    request: AttNetworkRequest;
-    responseResolves: AttNetworkResponseResolve[];
+    request: AttNetworkRequest | AttNetworkRequest[];
+    responseResolves: AttNetworkResponseResolve[] | AttNetworkResponseResolve[][];
     userAddress: string;
 }
 
@@ -47,9 +50,18 @@ export type FullAttestationParams = BaseAttestationParams & {
     attMode?: AttMode;
     attConditions?: object;
     additionParams?: string;
+    sslCipher?: AttSslCipher;
+    requestInterval?: number;
   }
 
 export type SignedAttRequest = {
     attRequest: FullAttestationParams,
     appSignature: string
+}
+
+export type ApiResponse<T = any> = {
+    rc: number;
+    mc: string;
+    msg: string;
+    result: T;
 }

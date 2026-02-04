@@ -57,35 +57,63 @@ startOffline = async (paramsObj) => {
   return JSON.parse(result);
 };
 
-chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   console.log('offscreen onMessage message', message);
-  let result;
-  if (message.type === 'algorithm' && message.method === 'init') {
-    result = await init();
-    console.log('offscreen onMessage send result', result);
-    sendResponse({ result });
-  } else if (
-    message.type === 'algorithm' &&
-    message.method === 'getAttestation'
-  ) {
-    result = await getAttestation(message.params);
-    console.log('offscreen onMessage send result', result);
-    sendResponse({ result });
-  } else if (
-    message.type === 'algorithm' &&
-    message.method === 'getAttestationResult'
-  ) {
-    result = await getAttestationResult();
-    console.log('offscreen onMessage send result', result);
-    sendResponse({ result });
-  } else if (
-    message.type === 'algorithm' &&
-    message.method === 'startOffline'
-  ) {
-    result = await startOffline(message.params);
-    console.log('offscreen onMessage send result', result);
-    sendResponse({ result });
-  }
+  let responded = false;
+  const safeSendResponse = (payload) => {
+    if (responded) return;
+    responded = true;
+    try {
+      sendResponse(payload);
+    } catch (e) {
+      console.warn('offscreen sendResponse error', e);
+    }
+  };
+
+  (async () => {
+    try {
+      if (message.type === 'algorithm' && message.method === 'init') {
+        const result = await init();
+        console.log('offscreen onMessage send result', result);
+        safeSendResponse({ result });
+      } else if (
+        message.type === 'algorithm' &&
+        message.method === 'getAttestation'
+      ) {
+        const result = await getAttestation(message.params);
+        console.log('offscreen onMessage send result', result);
+        safeSendResponse({ result });
+      } else if (
+        message.type === 'algorithm' &&
+        message.method === 'getAttestationResult'
+      ) {
+        const result = await getAttestationResult();
+        console.log('offscreen onMessage send result', result);
+        safeSendResponse({ result });
+      } else if (
+        message.type === 'algorithm' &&
+        message.method === 'startOffline'
+      ) {
+        const result = await startOffline(message.params);
+        console.log('offscreen onMessage send result', result);
+        safeSendResponse({ result });
+      } else {
+        safeSendResponse({
+          error: 'unknown message',
+          type: message?.type,
+          method: message?.method,
+        });
+      }
+    } catch (err) {
+      console.error('offscreen onMessage error', err);
+      safeSendResponse({
+        error: err?.message ?? String(err),
+        result: undefined,
+      });
+    }
+  })();
+
+  return true;
 });
 
 

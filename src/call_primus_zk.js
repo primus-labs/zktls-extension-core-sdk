@@ -59,10 +59,18 @@ function sendMessageAsync(message) {
   return new Promise((resolve, reject) => {
     chrome.runtime.sendMessage(message, (response) => {
       if (chrome.runtime.lastError) {
-        reject(new Error(chrome.runtime.lastError));
-      } else {
-        resolve(response);
+        reject(new Error(chrome.runtime.lastError.message));
+        return;
       }
+      if (response === undefined) {
+        reject(new Error('No response from offscreen (channel closed or listener did not respond)'));
+        return;
+      }
+      if (response.error) {
+        reject(new Error(response.error));
+        return;
+      }
+      resolve(response);
     });
   });
 }
