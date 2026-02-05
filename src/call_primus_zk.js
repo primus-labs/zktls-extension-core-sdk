@@ -1,8 +1,9 @@
 
-exports.init = async () => {
+exports.init = async (logLevel = 'info') => {
   let res = await sendMessageAsync({
     type: 'algorithm',
     method: 'init',
+    params: { logLevel }
   });
   return res.result;
 };

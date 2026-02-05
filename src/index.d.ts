@@ -30,6 +30,8 @@ export type Attestation = {
     signatures: string[],
 }
 
+export type LogLevel = 'info' | 'debug' | 'error'
+
 export type AttModeAlgorithmType = 'mpctls' | 'proxytls'
 export type AttModeResultType = 'plain' | 'cipher'
 export type AttSslCipher = 'ECDHE-RSA-AES128-GCM-SHA256' | 'ECDHE-ECDSA-AES128-GCM-SHA256'

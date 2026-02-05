@@ -31,7 +31,10 @@ const callAlgorithm = async (params) => {
   return Module_callAlgorithm(params);
 };
 
-init = async () => {
+init = async (logLevel = 'info') => {
+  const logParams = `{"method":"setLogLevel","version":"1.1.1","params":{"logLevel":"${logLevel}"}}`;
+  const logResult = await callAlgorithm(logParams);
+
   const params = `{"method":"init","version":"1.1.1","params":{}}`;
   const result = await callAlgorithm(params);
   return JSON.parse(result);
@@ -73,7 +76,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   (async () => {
     try {
       if (message.type === 'algorithm' && message.method === 'init') {
-        const result = await init();
+        const { logLevel } = message.params || {};
+        const result = await init(logLevel);
         console.log('offscreen onMessage send result', result);
         safeSendResponse({ result });
       } else if (

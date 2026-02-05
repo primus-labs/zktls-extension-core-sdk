@@ -1,6 +1,6 @@
 import { ethers } from 'ethers';
 import { PADOADDRESS } from './config/constants'
-import { AttNetworkRequest, AttNetworkResponseResolve, SignedAttRequest, Attestation } from './index.d'
+import { AttNetworkRequest, AttNetworkResponseResolve, SignedAttRequest, Attestation, LogLevel } from './index.d'
 // import { ZkAttestationError } from './error'
 import { AttRequest } from './classes/AttRequest'
 import { AlgorithmUrls } from "./classes/AlgorithmUrls";
@@ -28,10 +28,10 @@ class PrimusExtCoreTLS {
     this.algoUrls = new AlgorithmUrls();
   }
 
-  async init(appId: string, appSecret?: string): Promise<string | boolean> {
+  async init(appId: string, appSecret?: string, logLevel?: LogLevel): Promise<string | boolean> {
     this.appId = appId;
     this.appSecret = appSecret;
-    return await init();
+    return await init(logLevel);
   }
 
   private _validateRequest(request: AttNetworkRequest, index?: number): void {
