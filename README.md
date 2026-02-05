@@ -222,6 +222,46 @@ const additionParams = JSON.stringify({
 generateRequest.setAdditionParams(additionParams);
 ```
 
+### Binary Request Bodies
+
+For APIs that require binary request bodies (e.g., protobuf, msgpack, or other binary formats), you can use the `bodyEncoding` parameter to specify that the body is base64-encoded. The SDK will decode it before sending the request to the target server.
+
+```javascript
+// Example: Sending a protobuf-encoded request body
+const protobufData = new Uint8Array([0x0a, 0x0b, 0x68, 0x65, 0x6c, 0x6c, 0x6f, 0x20, 0x77, 0x6f, 0x72, 0x6c, 0x64]);
+
+// Convert binary data to base64
+const base64Body = btoa(String.fromCharCode.apply(null, protobufData));
+
+const request = {
+    url: "https://api.example.com/protobuf-endpoint",
+    method: "POST",
+    header: {
+        "Content-Type": "application/protobuf"
+    },
+    body: base64Body,
+    bodyEncoding: "base64"  // Tell SDK to decode the base64 body before sending
+};
+
+const responseResolves = [
+    {
+        keyName: 'response',
+        parsePath: '$',
+    }
+];
+
+const generateRequest = zkTLS.generateRequestParams(request, responseResolves);
+```
+
+**Why is this needed?**
+
+When using JSON to serialize request parameters, binary data can get corrupted because JSON strings cannot safely represent arbitrary byte sequences. By encoding binary bodies as base64 and specifying `bodyEncoding: "base64"`, the SDK will:
+
+1. Keep the base64 string intact during JSON serialization
+2. Decode the base64 string back to binary data before sending the request to the target server
+
+This ensures binary request bodies (like protobuf messages) are transmitted correctly.
+
 ### Extension Implementation
 
 Extension does not require appSecret parameter to initialize SDK.
