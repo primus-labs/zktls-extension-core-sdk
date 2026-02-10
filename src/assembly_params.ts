@@ -50,43 +50,9 @@ export function assemblyParams(att: SignedAttRequest, algorithmUrls: AlgorithmUr
     return attestationParams;
 }
 
-/**
- * Decodes a base64 string to a binary string (Latin-1 encoding).
- * This preserves binary data that will be sent as the request body.
- */
-function decodeBase64ToBinaryString(base64: string): string {
-    // For browser environment
-    if (typeof atob === 'function') {
-        return atob(base64);
-    }
-    // For Node.js environment
-    if (typeof Buffer !== 'undefined') {
-        const buffer = Buffer.from(base64, 'base64');
-        // Convert buffer to binary string (Latin-1)
-        let binaryString = '';
-        for (let i = 0; i < buffer.length; i++) {
-            binaryString += String.fromCharCode(buffer[i]);
-        }
-        return binaryString;
-    }
-    throw new Error('Unable to decode base64: no suitable decoder available');
-}
-
 function assemblyRequest(request: AttNetworkRequest | AttNetworkRequest[]) {
     const requests = Array.isArray(request) ? request : [request]
     return requests.map(({ url, header, method, body, bodyEncoding }, idx) => {
-        // Handle body encoding
-        let processedBody = body;
-        if (body && bodyEncoding === 'base64') {
-            try {
-                processedBody = decodeBase64ToBinaryString(body);
-            } catch (e) {
-                console.error('Failed to decode base64 body:', e);
-                // Fall back to original body if decoding fails
-                processedBody = body;
-            }
-        }
-
         return {
             url,
             method,
@@ -94,7 +60,8 @@ function assemblyRequest(request: AttNetworkRequest | AttNetworkRequest[]) {
                 ...header,
                 'Accept-Encoding': 'identity',
             },
-            body: processedBody,
+            body,
+            ...(bodyEncoding ? { bodyEncoding } : {}),
             name: `${url}-${idx}`
         };
     })
@@ -143,4 +110,3 @@ function assemblyResponse(responseResolves: AttNetworkResponseResolve[] | AttNet
       };
     });
   }
-

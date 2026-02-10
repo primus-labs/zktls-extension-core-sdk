@@ -7,11 +7,12 @@ export type AttNetworkRequest = {
      * Specifies the encoding of the body field.
      * - 'text' (default): Body is a plain text string, passed as-is
      * - 'base64': Body is base64-encoded binary data, will be decoded before sending
+     * - 'hex': Body is string of hex-encoded data, will be decoded before sending
      *
      * Use 'base64' for binary request bodies (e.g., protobuf, msgpack) that cannot
      * be safely represented as plain text strings in JSON.
      */
-    bodyEncoding?: 'text' | 'base64'
+    bodyEncoding?: 'text' | 'base64' | 'hex'
 }
 
 export type AttNetworkResponseResolve = {
