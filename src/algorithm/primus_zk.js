@@ -31,30 +31,31 @@ const callAlgorithm = async (params) => {
   return Module_callAlgorithm(params);
 };
 
+const VERSION = "1.4.6";
 init = async (logLevel = 'info') => {
-  const logParams = `{"method":"setLogLevel","version":"1.1.1","params":{"logLevel":"${logLevel}"}}`;
+  const logParams = `{"method":"setLogLevel","version":"${VERSION}","params":{"logLevel":"${logLevel}"}}`;
   const logResult = await callAlgorithm(logParams);
 
-  const params = `{"method":"init","version":"1.1.1","params":{}}`;
+  const params = `{"method":"init","version":"${VERSION}","params":{}}`;
   const result = await callAlgorithm(params);
   return JSON.parse(result);
 };
 
 getAttestation = async (paramsObj) => {
-  const _paramsObj = { method: "getAttestation", version: "1.1.1", params: paramsObj };
+  const _paramsObj = { method: "getAttestation", version: VERSION, params: paramsObj };
   const params = JSON.stringify(_paramsObj);
   const result = await callAlgorithm(params);
   return JSON.parse(result);
 };
 
 getAttestationResult = async () => {
-  const params = `{"method":"getAttestationResult","version":"1.1.1","params":{"requestid":"1"}}`;
+  const params = `{"method":"getAttestationResult","version":"${VERSION}","params":{"requestid":"1"}}`;
   const result = await callAlgorithm(params);
   return JSON.parse(result);
 }
 
 startOffline = async (paramsObj) => {
-  const _paramsObj = { method: "startOffline", version: "1.1.1", params: paramsObj };
+  const _paramsObj = { method: "startOffline", version: VERSION, params: paramsObj };
   const params = JSON.stringify(_paramsObj);
   const result = await callAlgorithm(params);
   return JSON.parse(result);
