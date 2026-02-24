@@ -1,6 +1,6 @@
 {
   "name": "@primuslabs/zktls-ext-core-sdk",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "author": "Primus Labs <dev@primuslabs.org>",
   "description": "Primus zktls algorithm sdk for extension",
   "repository": {
